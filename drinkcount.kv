@@ -1,9 +1,20 @@
 #:kivy 2.1.0
-#:import CardTransition kivy.uix.screenmanager.CardTransition
-#:import SlideTransition kivy.uix.screenmanager.SlideTransition
+#import Window kivy.core.window.Window
+
+<Main>:
+    bar: bar
+    manager: manager
+    orientation: 'vertical'
+    MDTopAppBar:
+        id: bar
+        title: 'DrinkCount'
+    MDBoxLayout:
+        padding: 10
+        ScreenManagement:
+            id: manager
+    
 
 <ScreenManagement>:
-    transition: CardTransition()
     MainScreen:
         name: 'main'
     MenuScreen:
@@ -81,29 +92,22 @@
 
 <MainScreen>:
     items: items
-    BoxLayout:
+    MDBoxLayout:
         orientation: 'vertical'
-        ActionBar:
-            ActionView:
-                ActionPrevious:
-                    title: 'DrinkCount'
-                ActionSeparator:
-                ActionGroup:
-                    ActionButton:
-                        text: 'test'
-                    ActionButton:
-                        text: 'DATA'
-                        on_press:
-                            root.manager.transition = SlideTransition()
-                            root.manager.transition.direction = 'left'
-                            root.manager.current = 'data'
-                    ActionButton:
-                        text: 'SET'
-                        on_press:
-                            root.manager.transition = CardTransition()
-                            root.manager.transition.direction = 'up'
-                            root.manager.transition.mode = 'push'
-                            root.manager.current = 'menu'
+        MDBoxLayout:
+            orientation: 'horizontal'
+            padding: 10
+            size_hint: (1, None)
+            height: 50
+            MDProgressBar:
+            MDProgressBar:
+            MDProgressBar:
+            MDProgressBar:
+            MDLabel:
+                text_size: self.size
+                halign: 'center'
+                valign: 'middle'
+                text: '0 / 10'
         ScrollView:
             do_scroll_x: False
             scroll_type: [ 'bars', 'content' ]
@@ -121,28 +125,21 @@
                     name: '2'
                 Item:
                     name: '3'
-        Button:
-            size_hint: (1, .2)
-            text: 'Info: ' + root.info
-            on_press: root.do_action()
+    MDFloatingActionButton:
+        icon: 'plus'
+        elevation: 12
+        pos_hint: { 'x': 0.85, 'y': 0.05 }
+        on_press: root.do_action()
 
 <MenuScreen>:
     settings: settings
     BoxLayout:
         orientation: 'vertical'
-        padding: 20
         spacing: 20
         Label:
             text: 'Menu'
         Settings:
             id: settings
-        Button:
-            text: 'Back'
-            on_press:
-                root.manager.transition = CardTransition()
-                root.manager.transition.direction = 'down'
-                root.manager.transition.mode = 'pop'
-                root.manager.current = 'main'
 
 <DataScreen>:
     BoxLayout:
@@ -151,9 +148,3 @@
         spacing: 20
         Label:
             text: 'Data'
-        Button:
-            text: 'Back'
-            on_press:
-                root.manager.transition = SlideTransition()
-                root.manager.transition.direction = 'right'
-                root.manager.current = 'main'

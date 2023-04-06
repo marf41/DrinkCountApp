@@ -1,25 +1,52 @@
 import kivy
 from kivy.lang import Builder
 from kivy.properties import StringProperty, ObjectProperty, NumericProperty
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.screenmanager import Screen, ScreenManager
-from kivy.uix.widget import Widget
-from kivy.uix.checkbox import CheckBox
+
+from kivymd.app import MDApp
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.gridlayout import MDGridLayout
+from kivymd.uix.screen import MDScreen
+from kivymd.uix.screenmanager import MDScreenManager
+from kivymd.uix.widget import Widget
+from kivymd.uix.selectioncontrol import MDCheckbox
+from kivymd.uix.button import MDTextButton
+
 from kivy.config import ConfigParser
 from kivy.uix.settings import Settings
 from kivy.clock import Clock
-from kivy.uix.button import Button
+from kivymd.utils import asynckivy
+
+from kivy.uix.screenmanager import CardTransition, SlideTransition
 
 # Builder.load_file("drinkcount.kv")
 kivy.require('2.1.0')
 
 from kivy.app import App
 
-class ScreenManagement(ScreenManager):
-    pass
+class ScreenManagement(MDScreenManager):
+    def change(self, screen):
+        self.current = screen
+    def goto_settings(self):
+        self.transition = CardTransition()
+        self.transition.direction = 'up'
+        self.transition.mode = 'push'
+        self.current = 'menu'
+    def goto_data(self):
+        self.transition = SlideTransition()
+        self.transition.direction = 'left'
+        self.current = 'data'
+    def goto_main(self):
+        if self.current == 'menu':
+            self.transition = CardTransition()
+            self.transition.direction = 'down'
+            self.transition.mode = 'pop'
+        else:
+            self.transition = SlideTransition()
+            self.transition.direction = 'right'
+        self.current = 'main'
 
-class Item(GridLayout):
+
+class Item(MDGridLayout):
     name = StringProperty()
     icon = StringProperty()
     marks = NumericProperty()
@@ -50,25 +77,51 @@ class Item(GridLayout):
         for i, mark in enumerate(self.ids.marks.children):
             mark.background_color = (0, 0, 1, 1) if (20 - i) <= self.marks else (.5, .5, .5, 1)
 
-class MainScreen(Screen):
+class MainScreen(MDScreen):
     info = StringProperty()
     items = ObjectProperty()
     def do_action(self):
         self.info = "New info"
         self.items.add_widget(Item(name='Test'))
 
-class DataScreen(Screen):
+class DataScreen(MDScreen):
     pass
 
-class MenuScreen(Screen):
+class MenuScreen(MDScreen):
     settings = ObjectProperty()
     def build(self):
         self.config = ConfigParser()
         self.config.read('drinkcount.ini')
 
-class DrinkCountApp(App):
+class Main(MDBoxLayout):
+    manager = ObjectProperty()
+    bar = ObjectProperty()
+    def action_back(self):
+        self.bar.right_action_items = [
+            [ 'chevron-left', lambda x: self.goto_main() ]
+        ]
+    def goto_settings(self):
+        self.manager.goto_settings()
+        self.action_back()
+    def goto_data(self):
+        self.manager.goto_data()
+        self.action_back()
+    def goto_main(self):
+        self.manager.goto_main()
+        self.bar.right_action_items = [
+            [ 'chart-bar', lambda x: self.goto_data() ],
+            [ 'menu', lambda x: self.goto_settings() ],
+        ]
+
+class DrinkCountApp(MDApp):
     def build(self):
-        return ScreenManagement()
+        self.theme_cls.theme_style = 'Dark'
+        return Main()
+    def on_start(self):
+        async def generate():
+            self.root.goto_main()
+        Clock.schedule_once(lambda x: asynckivy.start(generate()))
+
 
 
 if __name__ == '__main__':
