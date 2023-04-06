@@ -1,0 +1,159 @@
+#:kivy 2.1.0
+#:import CardTransition kivy.uix.screenmanager.CardTransition
+#:import SlideTransition kivy.uix.screenmanager.SlideTransition
+
+<ScreenManagement>:
+    transition: CardTransition()
+    MainScreen:
+        name: 'main'
+    MenuScreen:
+        name: 'menu'
+    DataScreen:
+        name: 'data'
+
+<ItemMark@Button>:
+    disabled: True
+    #background_checkbox_disabled_normal: 'atlas://data/images/defaulttheme/button'
+    background_disabled_normal: 'atlas://data/images/defaulttheme/button'
+    #width: self.height
+    #size_hint_x: None
+
+
+<Item>:
+    size_hint: (1.0, None)
+    cols: 2
+    spacing: 5
+    BoxLayout:
+        size_hint: (0.6, None)
+        orientation: 'vertical'
+        ProgressBar:
+            id: pbt
+            max: 100
+            size_hint_y: .1
+        Button:
+            id: icon
+            text: root.icon
+            on_press: root.item_press(self)
+            on_release: root.item_release(self)
+        ProgressBar:
+            id: pbb
+            max: 100
+            size_hint_y: .1
+    BoxLayout:      
+        orientation: 'vertical'
+        BoxLayout:      
+            orientation: 'horizontal'       
+            Label:
+                id: name 
+                text: root.name
+            BoxLayout:    
+                orientation: 'vertical'     
+                Label:
+                    id: count      
+                    text: str(root.marks) + ' / 20'      
+                Label:
+                    id: time
+                    text: '0:59'        
+        GridLayout:     
+            cols: 10
+            id: marks
+            spacing: 2
+            ItemMark:
+            ItemMark:
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+            ItemMark:       
+
+<MainScreen>:
+    items: items
+    BoxLayout:
+        orientation: 'vertical'
+        ActionBar:
+            ActionView:
+                ActionPrevious:
+                    title: 'DrinkCount'
+                ActionSeparator:
+                ActionGroup:
+                    ActionButton:
+                        text: 'test'
+                    ActionButton:
+                        text: 'DATA'
+                        on_press:
+                            root.manager.transition = SlideTransition()
+                            root.manager.transition.direction = 'left'
+                            root.manager.current = 'data'
+                    ActionButton:
+                        text: 'SET'
+                        on_press:
+                            root.manager.transition = CardTransition()
+                            root.manager.transition.direction = 'up'
+                            root.manager.transition.mode = 'push'
+                            root.manager.current = 'menu'
+        ScrollView:
+            do_scroll_x: False
+            scroll_type: [ 'bars', 'content' ]
+            bar_width: 2
+            GridLayout:
+                id: items
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                padding: 20
+                spacing: 20
+                Item:
+                    name: '1'
+                Item:
+                    name: '2'
+                Item:
+                    name: '3'
+        Button:
+            size_hint: (1, .2)
+            text: 'Info: ' + root.info
+            on_press: root.do_action()
+
+<MenuScreen>:
+    settings: settings
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 20
+        spacing: 20
+        Label:
+            text: 'Menu'
+        Settings:
+            id: settings
+        Button:
+            text: 'Back'
+            on_press:
+                root.manager.transition = CardTransition()
+                root.manager.transition.direction = 'down'
+                root.manager.transition.mode = 'pop'
+                root.manager.current = 'main'
+
+<DataScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 20
+        spacing: 20
+        Label:
+            text: 'Data'
+        Button:
+            text: 'Back'
+            on_press:
+                root.manager.transition = SlideTransition()
+                root.manager.transition.direction = 'right'
+                root.manager.current = 'main'
